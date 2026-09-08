@@ -38,6 +38,12 @@
             width: 64px;
             height: 20px;
             vertical-align: middle;
+            position: relative;
+        }
+
+        span, input{
+            position: absolute;
+            inset: 0;
         }
 
         input{
@@ -54,11 +60,15 @@
 
         const ROWS = 10
         const COLUMNS = 5
-
         const FIRST_CHAR_CODE = 65
 
-        const range = length => Array.from ({ length }, (_, i) => i);
+        const times = length => Array.from ({ length }, (_, i) => i);
         const getColumn = i => String.fromCharCode(FIRST_CHAR_CODE + i);
+
+        let STATE= times(COLUMNS)
+        .map(i => times(ROWS).map(j => ({computedValue : j, value: j})))
+
+        console.log(STATE)
 
         const renderSpreadSheet= () =>{
             const $table = $('table');
@@ -67,18 +77,18 @@
             
             const headerHTML = `<tr>
             <th></th>
-            ${range(COLUMNS).map(i => `<th>${getColumn(i)}</th>`).join('')}
+            ${times(COLUMNS).map(i => `<th>${getColumn(i)}</th>`).join('')}
             </tr>`
 
             $head.innerHTML = headerHTML
 
-            const bodyHTML = range(ROWS).map(row =>{
+            const bodyHTML = times(ROWS).map(row =>{
               return `<tr>
             <td>${row +1}</td>
-            ${range(COLUMNS).map(column => `
+            ${times(COLUMNS).map(column => `
             <td data-x="${column}" data-y="${row}">
-                <span></span>
-                <input type="text" value="" />
+                <span>${STATE[column][row].computedValue}</span>
+                <input type="text" value="${STATE[column][row].value}" />
             </td>
             `).join('')}
             </tr>`
