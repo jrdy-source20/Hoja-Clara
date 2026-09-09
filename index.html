@@ -217,6 +217,36 @@
             $$(`tr td:nth-child(${x + 1})`).forEach(el => el.classList.add('selected'))
         })
 
+        document.addEventListener('keydown', event => {
+            if(event.key === 'Backspace' && selectedColumn !== null){
+                times(ROWS).forEach(row =>{
+                    updateCell({ x: selectedColumn, y: row, value: ''})
+                })
+            renderSpreadSheet()
+            }
+        })
+
+        document.addEventListener('copy', event => {
+            if(selectedColumn !== null){
+                const columnValues = times(ROWS).map(row =>{
+                    return STATE[selectedColumn][row].computedValue
+                })
+                event.clipboardData.setData('text/plain', columnValues.join('\n'))
+                event.preventDefault()
+            }
+        })
+
+        document.addEventListener('click', event => {
+            const { target } = event 
+
+            const isThClicked = target.closest('th')
+            const isTdClicked = target.closest('td')
+
+            if(!isThClicked && !isTdClicked){
+                $$('.selected').forEach(el => el.classList.remove('selected'))
+                selectedColumn = null
+            }
+        })
         renderSpreadSheet()
     </script>
 </head>
