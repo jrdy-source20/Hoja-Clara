@@ -67,6 +67,14 @@
                 outline: 2px solid #09f;
             }
         }
+
+        .selected{
+            background: rgb(174, 223, 255);
+        }
+
+        th.selected{
+            background: rgb(146, 211, 255);
+        }
     </style>
     <script type="module">
 
@@ -83,6 +91,8 @@
         const times = length => Array.from ({ length }, (_, i) => i);
         const getColumn = i => String.fromCharCode(FIRST_CHAR_CODE + i);
 
+        let selectedColumn = null
+
         let STATE= times(COLUMNS)
         .map(i => times(ROWS).map(j => ({computedValue : 0, value: 0})))
 
@@ -98,6 +108,7 @@
 
             newstate[x][y] = cell
 
+            computeAllCells(newstate, generateCellsConstants(newstate))
             STATE = newstate
 
             renderSpreadSheet()
@@ -113,7 +124,18 @@
             }).join('\n')
         }
 
+        function computeAllCells(cells, constants){
+            console.log('computeAllCells')
+            cells.forEach((rows, x)=>{
+                rows.forEach((cell, y)=>{
+                    cell.computedValue = computeValue(cell.value, constants)
+                    
+                })
+            })
+        }
+
         function computeValue(value, constants){
+            if(typeof value === 'number') return value
             if(!value.startsWith('=')) return value
 
             const formula = value.slice(1)
@@ -127,6 +149,8 @@
             } catch(e){
                 computedValue = `!ERROR: ${e.message}`
             }
+
+            console.log({ value, computedValue })
             return computedValue
         }
 
@@ -177,6 +201,20 @@
 
             updateCell({ x, y, value: input.value})
           }, { once: true })
+        })
+
+        $head.addEventListener('click', event =>{
+            const th = event.target.closest('th')
+            if(!th) return
+
+            const x = [... th.parentNode.children].indexOf(th)
+            if(x<0) return
+
+            selectedColumn = x - 1
+
+            $$('.selected').forEach(el => el.classList.remove('selected'))
+            th.classList.add('selected')
+            $$(`tr td:nth-child(${x + 1})`).forEach(el => el.classList.add('selected'))
         })
 
         renderSpreadSheet()
